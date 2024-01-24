@@ -17,13 +17,10 @@ func ConnectDatabase() {
 	if err != nil {
 		panic(err)
 	}
-
 	// AutoMigrate untuk tabel User
 	err = db.AutoMigrate(&User{})
 	if err != nil {
 		panic(err)
 	}
-
 	DB = db
-
 }

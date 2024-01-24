@@ -47,9 +47,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// generate token
-	expTime := time.Now().Add(time.Minute * 1)
+	expTime := time.Now().Add(time.Minute * 60)
 	claims := &config.JWTclaim{
 		Username: user.Username,
+		UserId:   user.Id, // Menambahkan UserId ke dalam claims
 		RegisteredClaims: jwt.RegisteredClaims{
 			Issuer:    "go-jwt-mux",
 			ExpiresAt: jwt.NewNumericDate(expTime),

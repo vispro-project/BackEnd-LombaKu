@@ -21,6 +21,9 @@ func main() {
 	api.HandleFunc("/lomba", lombacontroller.Create).Methods("POST")
 	api.HandleFunc("/lomba/{id}", lombacontroller.Index).Methods("PUT")
 	api.HandleFunc("/lomba/{id}", lombacontroller.Delete).Methods("DELETE")
+	api.HandleFunc("/searchlomba", lombacontroller.SearchLombaByName).Methods("GET")
+	api.HandleFunc("/lomba/{id}/like", lombacontroller.LikeLomba).Methods("POST") // Endpoint untuk Like
+
 	api.Use(middlewares.JWTMiddleware)
 
 	r.HandleFunc("/login", authcontroller.Login).Methods("POST")

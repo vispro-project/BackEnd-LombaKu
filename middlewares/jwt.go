@@ -13,16 +13,15 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		c, err := r.Cookie("token")
 		if err != nil {
 			if err == http.ErrNoCookie {
-				response := map[string]string{"message": "unauthorized"}
-				helper.ResponseJson(w, http.StatusUnauthorized, response)
+				helper.ResponseError(w, http.StatusUnauthorized, "Unauthorized: No token found")
 				return
 			}
 		}
-		tokeString := c.Value
 
+		tokenString := c.Value
 		claims := &config.JWTclaim{}
 
-		token, err := jwt.ParseWithClaims(tokeString, claims, func(t *jwt.Token) (interface{}, error) {
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 			return config.JWT_KEY, nil
 		})
 
@@ -30,26 +29,22 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			v, _ := err.(*jwt.ValidationError)
 			switch v.Errors {
 			case jwt.ValidationErrorSignatureInvalid:
-				response := map[string]string{"message": "unauthorized"}
-				helper.ResponseJson(w, http.StatusUnauthorized, response)
+				helper.ResponseError(w, http.StatusUnauthorized, "Unauthorized: Invalid token signature")
 				return
 			case jwt.ValidationErrorExpired:
-				response := map[string]string{"message": "Token Expired"}
-				helper.ResponseJson(w, http.StatusUnauthorized, response)
+				helper.ResponseError(w, http.StatusUnauthorized, "Unauthorized: Token expired")
 				return
 			default:
-				response := map[string]string{"message": "unauthorized"}
-				helper.ResponseJson(w, http.StatusUnauthorized, response)
+				helper.ResponseError(w, http.StatusUnauthorized, "Unauthorized: Invalid token")
 				return
-
 			}
 		}
 
 		if !token.Valid {
-			response := map[string]string{"message": "unauthorized"}
-			helper.ResponseJson(w, http.StatusUnauthorized, response)
+			helper.ResponseError(w, http.StatusUnauthorized, "Unauthorized: Token is not valid")
 			return
 		}
+
 		next.ServeHTTP(w, r)
 	})
 }
